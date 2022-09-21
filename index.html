@@ -1,0 +1,133 @@
+<!-- 
+<a href="" id="a">click here to download your file</a>
+<button onclick="download('file text', 'tiktok_list_url_audio_dowload.txt', 'text/plain')">Create file</button> -->
+<style>
+	.loader {
+		border: 16px solid #f3f3f3;
+		/* Light grey */
+		border-top: 16px solid #3498db;
+		/* Blue */
+		border-radius: 50%;
+		width: 120px;
+		height: 120px;
+		animation: spin 2s linear infinite;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+</style>
+<br>
+Input user id tiktok :
+<input id="user_id" value="" style="height: 50px;">
+<button id="btn_search" onclick="seach_audio_tiktok()">Search</button>
+<br>
+<br>
+<br>
+<audio id="player" src="https://p16-va-default.akamaized.net/obj/musically-maliva-obj/7002634676770999045.mp3" controls>
+</audio>
+<br>
+<br>
+Current audio:
+<span id="current_name_audio">audio_item_default</span>
+<br>
+<br>
+<h4>List audio tiktok</h4>
+<ol id="list_audio">
+</ol>
+<div id="loader" class="loader" style="display: none;"></div>
+
+<script>
+	list_url_audio_dowload = [];
+	// Function to download data to a file
+	function download(data, filename, type) {
+		var file = new Blob([data], { type: type });
+		if (window.navigator.msSaveOrOpenBlob) // IE10+
+			window.navigator.msSaveOrOpenBlob(file, filename);
+		else { // Others
+			var a = document.createElement("a"),
+				url = URL.createObjectURL(file);
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			setTimeout(function () {
+				document.body.removeChild(a);
+				window.URL.revokeObjectURL(url);
+			}, 0);
+		}
+	}
+
+	// https://rapidapi.com/yi005/api/tiktok-video-no-watermark2
+	function seach_audio_tiktok() {
+		document.getElementById("list_audio").innerHTML = '';
+		var user_id = document.getElementById('user_id').value;
+
+		if (user_id == '') {
+			alert('no user id')
+			return
+		} else {
+			alert(' co user id')
+			// return
+
+		}
+		
+		document.getElementById("loader").style.display = "block";
+
+		list_url_audio_dowload.push('name user: ' + user_id);
+		list_url_audio_dowload.push('\r\n');
+
+		const options = {
+			method: 'GET',
+			headers: {
+				'X-RapidAPI-Key': '9eb1f8da30msha63635a52ba215ep1f3b13jsn010d6e65a950',
+				'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
+			}
+		};
+
+		fetch('https://tiktok-video-no-watermark2.p.rapidapi.com/user/posts?unique_id=' + user_id + '&count=50', options)
+			.then(response => response.json())
+			.then(response => {
+				console.log(response)
+				let list_video = response.data.videos;
+				console.log(list_video);
+				list_video.forEach((value, index) => {
+					const node = document.createElement("li");
+					node.setAttribute("id", "item_audio_" + index);
+					const textnode = document.createTextNode(value.music);
+					node.appendChild(textnode);
+					document.getElementById("list_audio").appendChild(node);
+
+					list_url_audio_dowload.push(value.music);
+					list_url_audio_dowload.push('\r\n');
+
+				});
+
+				download(list_url_audio_dowload, user_id + '_tiktok_audio.txt', 'text/plain')
+
+				document.getElementById("loader").style.display = "none";
+			})
+			.catch(err => {
+				console.error(err);
+				alert(err)
+			});
+
+	}
+
+	var audio_player = document.getElementById('player');
+	var index = 0;
+	audio_player.addEventListener("ended", function (e) {
+		index++;
+		var audio_link = document.getElementById('item_audio_' + index).innerHTML;
+		document.getElementById('item_audio_' + index).style.color = "red";
+		document.getElementById('current_name_audio').innerHTML = 'audio_item_' + index;
+		audio_player.src = audio_link;
+		audio_player.play();
+	});
+</script>
