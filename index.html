@@ -1,8 +1,9 @@
 <!-- 
 <a href="" id="a">click here to download your file</a>
 <button onclick="download('file text', 'tiktok_list_url_audio_dowload.txt', 'text/plain')">Create file</button> -->
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <style>
 	.loader {
@@ -25,6 +26,40 @@
 			transform: rotate(360deg);
 		}
 	}
+
+	/** Switch -------------------------------------*/
+	.switch input {
+		position: absolute;
+		opacity: 0;
+	}
+
+	.switch {
+		display: inline-block;
+		font-size: 20px;
+		/* 1 */
+		height: 1em;
+		width: 2em;
+		background: #BDB9A6;
+		border-radius: 1em;
+	}
+
+	.switch div {
+		height: 1em;
+		width: 1em;
+		border-radius: 1em;
+		background: #FFF;
+		box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.3);
+		-webkit-transition: all 300ms;
+		-moz-transition: all 300ms;
+		transition: all 300ms;
+	}
+
+	.switch input:checked+div {
+		background: #155d8d;
+		-webkit-transform: translate3d(100%, 0, 0);
+		-moz-transform: translate3d(100%, 0, 0);
+		transform: translate3d(100%, 0, 0);
+	}
 </style>
 <br>
 Input user id tiktok :
@@ -40,6 +75,12 @@ Input user id tiktok :
 Current audio:
 <span id="current_name_audio">audio_item_default</span>
 <br>
+<br>
+<!-- Rounded switch -->
+Loop list audio :
+<label class="switch"><input type="checkbox" id="checkLoop" />
+	<div></div>
+</label>
 <br>
 <h4>List audio tiktok</h4>
 <ol id="list_audio">
@@ -76,11 +117,11 @@ Current audio:
 			alert('no user id')
 			return
 		} else {
-			alert(' co user id')
+			// alert(' co user id')
 			// return
 
 		}
-		
+
 		document.getElementById("loader").style.display = "block";
 
 		list_url_audio_dowload.push('name user: ' + user_id);
@@ -123,14 +164,29 @@ Current audio:
 
 	}
 
-	var audio_player = document.getElementById('player');
 	var index = 0;
-	audio_player.addEventListener("ended", function (e) {
-		index++;
+
+	autoPlay(35);
+
+	function autoPlay(index = 0) {
+		var audio_player = document.getElementById('player');
+		audio_player.play();
+		audio_player.addEventListener("ended", function (e) {
+			if (document.getElementById('item_audio_' + index) == null
+				&& document.getElementById("checkLoop").checked == true) {
+				index = -1;
+			}
+			index++;
+			playAudio(index)
+		});
+	}
+
+	function playAudio(index) {
+		var audio_player = document.getElementById('player');
 		var audio_link = document.getElementById('item_audio_' + index).innerHTML;
 		document.getElementById('item_audio_' + index).style.color = "red";
 		document.getElementById('current_name_audio').innerHTML = 'audio_item_' + index;
 		audio_player.src = audio_link;
 		audio_player.play();
-	});
+	}
 </script>
